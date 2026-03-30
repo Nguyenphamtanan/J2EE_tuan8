@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Giỏ hàng</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8fafc;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        .topbar {
+            background: linear-gradient(135deg, #0f172a, #2563eb);
+            color: white;
+            padding: 22px 0;
+            margin-bottom: 28px;
+        }
+
+        .box-card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+        }
+
+        .table thead th {
+            background: #0f172a;
+            color: white;
+        }
+
+        .form-control {
+            border-radius: 10px;
+        }
+
+        .btn {
+            border-radius: 10px;
+        }
+
+        .summary-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 18px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="mb-1 fw-bold">Giỏ hàng của bạn</h2>
+            <p class="mb-0 opacity-75">Kiểm tra sản phẩm trước khi đặt hàng</p>
+        </div>
+        <a th:href="@{/products}" class="btn btn-light fw-semibold">← Tiếp tục mua</a>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card box-card">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-3">Danh sách sản phẩm</h4>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                            <tr>
+                                <th>Tên</th>
+                                <th>Giá</th>
+                                <th width="190">Số lượng</th>
+                                <th>Tổng tiền</th>
+                                <th>Thao tác</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${#lists.isEmpty(cartItems)}">
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    Giỏ hàng hiện đang trống
+                                </td>
+                            </tr>
+
+                            <tr th:each="item : ${cartItems}">
+                                <td class="fw-semibold" th:text="${item.product.name}"></td>
+                                <td th:text="${#numbers.formatDecimal(item.product.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
+                                <td>
+                                    <form th:action="@{/cart/update}" method="post" class="d-flex gap-2">
+                                        <input type="hidden" name="productId" th:value="${item.product.id}">
+                                        <input type="number" name="quantity" th:value="${item.quantity}" min="1" class="form-control">
+                                        <button type="submit" class="btn btn-outline-primary btn-sm">Cập nhật</button>
+                                    </form>
+                                </td>
+                                <td class="fw-bold text-primary"
+                                    th:text="${#numbers.formatDecimal(item.subtotal, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
+                                <td>
+                                    <a th:href="@{'/cart/remove/' + ${item.product.id}}" class="btn btn-outline-danger btn-sm">
+                                        Xóa
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="summary-box">
+                <h4 class="fw-bold mb-3">Tóm tắt đơn hàng</h4>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-secondary">Tổng thanh toán</span>
+                    <span class="fw-bold fs-5 text-primary"
+                          th:text="${#numbers.formatDecimal(total, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span>
+                </div>
+
+                <form th:action="@{/checkout}" method="post" class="d-grid">
+                    <button type="submit" class="btn btn-success fw-semibold py-2"
+                            th:disabled="${#lists.isEmpty(cartItems)}">
+                        Đặt hàng ngay
+                    </button>
+                </form>
+
+                <p class="text-muted small mt-3 mb-0">
+                    Vui lòng kiểm tra số lượng sản phẩm trước khi xác nhận đặt hàng.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

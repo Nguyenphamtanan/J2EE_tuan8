@@ -33,8 +33,16 @@ public class SecurityConfig {
                 .userDetailsService(accountService)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/css/**", "/js/**", "/images/**").permitAll()
+
+                        // ADMIN và USER đều xem được danh sách sản phẩm
                         .requestMatchers("/products").hasAnyRole("ADMIN", "USER")
+
+                        // Chỉ USER mới dùng giỏ hàng và đặt hàng
+                        .requestMatchers("/cart/**", "/checkout", "/checkout/success").hasRole("USER")
+
+                        // Chỉ ADMIN mới thêm / sửa / xóa sản phẩm
                         .requestMatchers("/products/add", "/products/edit/**", "/products/delete/**").hasRole("ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
